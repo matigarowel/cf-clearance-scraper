@@ -3,7 +3,8 @@
   "version": "2.0.7",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start-win": "set SKIP_LAUNCH=false && node src/index.js",
+    "start-linux": "SKIP_LAUNCH=false node src/index.js",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest --detectOpenHandles --verbose"
   },
   "jest": {
