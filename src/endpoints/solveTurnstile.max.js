@@ -55,7 +55,7 @@ function solveTurnstileMin({ url, proxy }) {
             })
 
             await page.waitForSelector('[name="cf-response"]', {
-                timeout: 60000
+                timeout: global.timeOut
             })
             const token = await page.evaluate(() => {
                 try {
@@ -71,7 +71,7 @@ function solveTurnstileMin({ url, proxy }) {
             return resolve(token)
         } catch (e) {
             if (!isResolved) {
-                await context.close()
+                // await context.close()
                 clearInterval(cl)
                 reject(e.message)
             }
