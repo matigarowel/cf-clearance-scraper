@@ -24,3 +24,19 @@ COPY . .
 EXPOSE 3000
 
 CMD ["pm2-runtime", "src/index.js"]
+
+# Build Image
+# docker build -t captcha-solver .
+
+# Run Docker
+# docker run -d --name captcha-solver-container -p 3000:3000 -e PORT=3000 -e browserLimit=20 -e timeOut=60000 captcha-solver
+
+# Check logs of container
+# docker logs -f <container_name_or_id>
+
+# Get list container
+# docker ps #actrive
+# docker ps -a #all
+
+# Get list images
+# docker images
