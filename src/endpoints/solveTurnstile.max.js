@@ -103,8 +103,8 @@ function solveTurnstileMin({ url, proxy }) {
 
             // console.log("done token.....", token)
             isResolved = true
-            // clearInterval(cl)
-            // await context.close()
+            clearInterval(cl)
+            await context.close()
             console.log((!token || token.length < 10))
             if (!token || token.length < 10) return reject('Failed to get token')
             return resolve(token)
