@@ -25,6 +25,7 @@ function solveTurnstileMin({ url, proxy }) {
             const interceptManager = new RequestInterceptionManager(client)
 
             await page.setRequestInterception(true);
+
             page.on('request', async (request) => {
                 try {
                     if (proxy) {
@@ -44,6 +45,7 @@ function solveTurnstileMin({ url, proxy }) {
                     urlPattern: url,
                     resourceType: 'Document',
                     modifyResponse({ body }) {
+                        console.log("body", body)
                         return {
                             body: String(body).replace('</body>', String(require('fs').readFileSync('./src/data/callback.html')) + '</body>')
                         }
@@ -51,12 +53,46 @@ function solveTurnstileMin({ url, proxy }) {
                 }
             )
             await page.goto(url, {
-                waitUntil: 'domcontentloaded'
+                waitUntil: 'domcontentloaded', timeout: global.timeOut || 3600000
             })
 
-            await page.waitForSelector('[name="cf-response"]', {
-                timeout: global.timeOut
+            await page.addScriptTag({
+                content: `
+                    const fingerprinttwo = document.createElement('div');
+                    fingerprinttwo.id = 'fingerprinttwo';
+                    fingerprinttwo.textContent = new Fingerprint({canvas: true,screen_resolution: true,ie_activex: true}).get();
+                    document.body.appendChild(fingerprinttwo);
+
+                    const fingerprintone = document.createElement('div');fingerprintone.id = 'fingerprintone';
+                    fingerprintone.textContent = fingerprint;document.body.appendChild(fingerprintone);
+                `
+            }).then(async () => {
+                let fingerprintone = await page.evaluate(() => {
+                    let value = document.querySelector(`#fingerprintone`)?.textContent;
+                    return value
+                })
+
+                console.log("fingerprintone", fingerprintone)
+
+                let fingerprinttwo = await page.evaluate(() => {
+                    let value = document.querySelector(`#fingerprinttwo`)?.textContent;
+                    return value
+                })
+
+                console.log("fingerprinttwo", fingerprinttwo)
+
+            }).catch((ex) => {
+                console.log(ex)
             })
+
+            // console.log("done loading page.....")
+
+            await page.waitForSelector('[name="cf-response"]', {
+                timeout: global.timeOut || 3600000
+            })
+
+            // console.log("done waitForSelector.....")
+
             const token = await page.evaluate(() => {
                 try {
                     return document.querySelector('[name="cf-response"]').value
@@ -64,12 +100,16 @@ function solveTurnstileMin({ url, proxy }) {
                     return null
                 }
             })
+
+            // console.log("done token.....", token)
             isResolved = true
-            clearInterval(cl)
-            await context.close()
+            // clearInterval(cl)
+            // await context.close()
+            console.log((!token || token.length < 10))
             if (!token || token.length < 10) return reject('Failed to get token')
             return resolve(token)
         } catch (e) {
+            console.log(e)
             if (!isResolved) {
                 // await context.close()
                 clearInterval(cl)
@@ -79,4 +119,5 @@ function solveTurnstileMin({ url, proxy }) {
 
     })
 }
+
 module.exports = solveTurnstileMin

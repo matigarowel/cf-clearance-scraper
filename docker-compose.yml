@@ -1,0 +1,22 @@
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - /d/Matiga/Project/cf-clearance-scraper/src:/src
+
+
+
+
+# Step 1 Rebuild the Docker Container
+# docker-compose up --build -d
+
+# Step 2 Clean Up Images
+# docker image prune -a
+
+
+# docker exec -it cf-clearance-scraper-web-1 /bin/bash
+# export timeOut=3600000
